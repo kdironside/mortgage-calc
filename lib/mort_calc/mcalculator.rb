@@ -1,11 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + "/../../lib/mort_calc/validator")
-# require 'flt'
+require 'flt'
 
 module MortCalc
 
   class Calculator 
-    attr_accessor :user_input, :amount, :interest, :term_years, :monthly_payment
-    # include Flt
+    attr_accessor :user_input, :status, :amount, :interest, :term_years, :monthly_payment
+    include Flt
     include Validator
     extend Validator
     
@@ -15,22 +15,24 @@ module MortCalc
     
     def run_calc
       @output.puts 'Welcome to the Ruby Mortgage Calculator!'
-      @amount = getinput("amount").to_i
-      @output.puts @amount
-      @interest = getinput("interest").to_i # multiplied by 1000!
-      @output.puts @interest 
+      @amount = DecNum(getinput("amount"))
+      @interest = DecNum(getinput("interest"))
       @term_years = getinput("term_years").to_i
-      @output.puts @term_years
       @monthly_payment = calculate_payment(@amount, @interest, @term_years)
       self.finish(@monthly_payment)
     end
   
     def getinput(object_name)
-      input_value = validator(object_name)
-      if input_value == nil
-        self.quit
+      input_value = ["incoming", nil]
+      @output.puts input_value[0]     
+      until input_value[0] == "good" 
+        input_value = validator(object_name)
+        @output.puts input_value.to_s
+        if input_value[1] == nil
+          self.quit
+        end
       end
-      return input_value
+      return input_value[1]
     end
     
     def calculate_payment(amount, interest, term_years)
