@@ -14,25 +14,20 @@ module MortCalc
     end
     
     def run_calc
-      @output.puts 'Welcome to the Ruby Mortgage Calculator!'
-      @amount = DecNum(getinput("amount"))
-      @interest = DecNum(getinput("interest"))
-      @term_years = getinput("term_years").to_i
+      @output.puts "\nWelcome to the Ruby Mortgage Calculator!"
+      self.getinput("amount")
+      self.getinput("interest")
+      self.getinput("term_years")
       @monthly_payment = calculate_payment(@amount, @interest, @term_years)
       self.finish(@monthly_payment)
     end
   
-    def getinput(object_name)
-      input_value = ["incoming", nil]
-      @output.puts input_value[0]     
-      until input_value[0] == "good" 
-        input_value = validator(object_name)
-        @output.puts input_value.to_s
-        if input_value[1] == nil
-          self.quit
-        end
+    def getinput(object_name) 
+      input_value = validator(object_name)                    
+      if input_value == nil
+        self.quit
       end
-      return input_value[1]
+      return input_value
     end
     
     # The formula below calculates M, the monthly mortgage payment:
@@ -48,11 +43,12 @@ module MortCalc
     end    
   
     def finish(monthly_payment)
-      @output.puts "Your monthly payment is:" + "\n$%.2f per month" % [monthly_payment] 
+      @output.puts "\nYour monthly payment is: " + " $%.2f per month" % [monthly_payment]
+      @output.puts "\nThank you for using the Ruby Mortgage Calculator!" 
     end 
     
     def quit
-      @output.puts "Oops, no value entered...exiting..."
+      @output.puts "Oops, no value entered...exiting...toodles!"
       exit
     end       
   end

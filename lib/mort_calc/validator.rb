@@ -1,58 +1,65 @@
-require 'flt'
+require 'flt'                     # rubygem to convert float to decimal 
 
 module Validator
   include Flt
         
-  def validator(data_object)      
-    @user_input = data_object == "amount" ? self.getamt : data_object == "interest" ? self.getinterest : self.getyears    
+  def validator(obj)
+    prompt_message(obj)
+    @status = 'pending'
+    while @status == 'pending' 
+      input = gets.chomp
+      return nil if input == ''           
+      @user_input = obj == "amount" ? self.getamt(input) : obj == "interest" ? self.getint(input) : self.getyrs(input) 
+    end
+    return input          # dummy, not really used other than to prevent premature exit.
   end
   
-  def getamt
-    @output.puts 'Enter principal amount in U.S.dollars:'           
-    usdollaramt = gets.chomp
-    usdollaramt = usdollaramt.to_s.gsub(/[^0-9.]+/, '')
-    @amount = DecNum(usdollaramt).to_i  
+  
+  def prompt_message(obj)
+    @output.puts 'Enter principal amount in U.S.dollars:'                                     if obj == "amount"
+    @output.puts 'Enter annual interest rate between 0.125% and 35% (rounds to 3 decimals):'  if obj == "interest" 
+    @output.puts 'Enter the length of the loan in integer years (up to 99):'                  if obj == "term_years"    
+  end
+  
+  
+# strip non-numeric chars except "." truncate decimals, validate range, display result 
+  def getamt(input)           
+    usdollaramt = input.to_s.gsub(/[^0-9.]+/, '')
+    @amount = usdollaramt.to_i
     if @amount.between?(100,100000000)
       @output.puts 'The principal amount you entered is: ' + @amount.to_s
-      @status = 'good'
+      @status = 'valid'
     else
-      @amount = 0 
       @output.puts 'Oops, Principal Amount must be between $100 and $100M!'
-      @status = 'bad'
     end
-    return @status, @amount 
+    return @amount 
   end  
-  
-  def getinterest
-    @status == nil            
-    @output.puts 'Enter annual interest rate between 0.125% and 30.0% (rounds to 3 decimals):'    
-    intrate = gets.chomp
-    intrate = intrate.to_s.gsub(/[^0-9.]+/, '')
+
+
+# strip non-numeric chars except ".", validate range and decimals places, display result 
+  def getint(input)          
+    intrate = input.to_s.gsub(/[^0-9.]+/, '')
     @interest = DecNum(intrate).round(:places=>3) 
-    if @interest.between?(0.125,30.0)
+    if @interest.between?(0.125,35.0)
       @output.puts 'The interest Rate you entered is: ' + @interest.to_s
-      @status = 'good'
+      @status = 'valid'
     else 
-      @interest = 0
-      @output.puts 'Oops, Interest Rate must be between 0.125 and 30 percent!'
-      @status = 'bad'
+      @output.puts 'Oops, Interest Rate must be between 0.125 and 35 percent!'
     end
-    return @status, @interest 
+    return @interest 
   end
-  
-  def getyears 
-    @output.puts 'Enter the length of the loan in integer years:'          
-    years = gets.chomp
-    years = years.gsub(/[^0-9.]+/, '')          
+
+
+# strip non-numeric chars except "." truncate decimals, validate range, display result in integers  
+  def getyrs(input) 
+    years = input.gsub(/[^0-9.]+/, '')          
     @term_years = years.to_i
-    if @term_years.between?(1,30)
+    if @term_years.between?(1,99)
       @output.puts 'The term length you entered is: ' + @term_years.to_s + ' years'
-      @status = 'good'
-    else 
-      @term_years = 0
-      @output.puts 'Oops, loan length must be between 1 and 30 years!'
-      @status = 'bad'
+      @status = 'valid'
+    else
+      @output.puts 'Oops, loan length must be between 1 and 99 years!'
     end
-    return @status, @term_years 
+    return @term_years 
   end
 end

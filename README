@@ -1,1 +1,3 @@
 Ruby exercise: write a mortgage calculator. Use RSpec.
+
+To run go to the root directory and enter: bin/mort_calc
